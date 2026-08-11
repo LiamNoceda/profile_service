@@ -10,13 +10,13 @@ use spatial::get_spatial_handler;
 #[tokio::main]
 async fn main() {
     let pool = PgPoolOptions::new()
-        .max_connections(20)
-        .min_connections(1)
-        .acquire_timeout(std::time::Duration(5))
+        .max_connections()
+        .min_connections()
+        .acquire_timeout(std::time::Duration())
         .connect(&)
         .await.expect("Failed to connect to Postgres");
 
-    sqlx::migrate!("./migrations")
+    sqlx::migrate!("./")
         run(&pool)
         .await
         .expect("Failed run database migrations");
