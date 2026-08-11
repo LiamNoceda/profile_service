@@ -2,12 +2,10 @@ use axum::{
     routing::{get, post}
     Router,
 };
-use towe_http::cors::{AllowOrigin, CorsLayer};
 use sqlx::postgres::PgPoolOptions;
-use std::sync::Arc;
 
 mod spatial;
-use spatial::get_spatial;
+use spatial::get_spatial_handler;
 
 #[tokio::main]
 async fn main() {
