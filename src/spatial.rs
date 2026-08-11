@@ -1,0 +1,23 @@
+use axum::{
+    extract::State,
+    http::StatusCode,
+    Json,
+};
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use std::sync::Arc;
+
+pub async fn get_spatial_handler(State(ctx): State<Arc<AppConfig>>, Json(payload): Json<SpatialRequest>) -> Result<Option<Json<SpatialResponse>>, StatusCode> {
+    // Функция которая будет отправлять основные данные с бд на фронт
+    // Которые были добавленны с регистрации (username, phone, email, castom_id)
+    // А также последующие данные после изменений (name, fullname, прошлые данные с регистрации, и т.д.)
+
+    /*
+    Пример запроса
+        бек хендлер принимает запрос с фронта, который содержит кастомный идентификатор пользователя (custom_id).
+        Затем он выполняет SQL-запрос к базе данных, чтобы получить данные пользователя, связанные с этим идентификатором. Если данные найдены, они возвращаются в формате JSON.
+        Если данные не найдены, возвращается статус 404 Not Found.
+        для логирования ошибок используется логгер, который записывает ошибки в файл или выводит их в консоль.
+        tracing::error!("Error fetching user data: {:?}", e);
+    */
+}
