@@ -4,6 +4,7 @@ use axum::{
     Json,
 };
 use sqlx::PgPool;
+use serde::{Deserialize, Serialize};
 
 pub async fn get_spatial_handler(State(ctx): State<>, Json(payload): Json<>) -> Result<Option<Json<>>, StatusCode> {
     // Функция которая будет отправлять основные данные с бд на фронт
