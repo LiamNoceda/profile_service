@@ -5,8 +5,9 @@ use axum::{
 };
 use sqlx::PgPool;
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
-pub async fn get_spatial_handler(State(ctx): State<>, Json(payload): Json<>) -> Result<Option<Json<>>, StatusCode> {
+pub async fn get_spatial_handler(State(ctx): State<>, claims: Claims,) -> Result<Json<>>, StatusCode> {
     // Функция которая будет отправлять основные данные с бд на фронт
     // Которые были добавленны с регистрации (username, phone, email, castom_id)
     // А также последующие данные после изменений (name, fullname, прошлые данные с регистрации, и т.д.)
@@ -24,4 +25,16 @@ pub async fn get_spatial_handler(State(ctx): State<>, Json(payload): Json<>) -> 
         3 Данные найдены, возврашает в формате JSOM
         4 Или возвращает статус 404
     */
+
+    payload.validate()?;
+
+    let get_pool = query_as!(
+        "SELECT username FROM users WHERE castom_id = $1",
+        &claims.sub
+    )
+    .fetch_optional(&ctx)
+    .await?
+    .or_or_else(|| AppError::Conflict("User spatial not found in system"))?;
+
+    Ok(Json(get_pool))
 }
