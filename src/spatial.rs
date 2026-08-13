@@ -7,7 +7,7 @@ use sqlx::PgPool;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub async fn get_spatial_handler(State(ctx): State<>, claims: Claims,) -> Result<Json<>>, StatusCode> {
+pub async fn get_spatial_handler(State(ctx): State<PgPool>, claims: Claims,) -> Result<Json<>>, StatusCode> {
     // Функция которая будет отправлять основные данные с бд на фронт
     // Которые были добавленны с регистрации (username, phone, email, castom_id)
     // А также последующие данные после изменений (name, fullname, прошлые данные с регистрации, и т.д.)
