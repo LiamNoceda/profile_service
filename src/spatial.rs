@@ -1,40 +1,40 @@
 use axum::{
-    response::IntoResponse,
+    response::{IntoResponse, Response},
     extract::State,
     http::StatusCode,
     Json,
 };
-use sqlx::PgPool;
-use serde::{Deserialize, Serialize};
+use sqlx::query_as;
+use serde::Serialize;
 use validator::Validate;
 use std::sync::Arc;
 
-pub async fn get_spatial_handler(State(ctx): State<Arc<AppConfig>>, claim: Claim,) -> Result<IntoResponse, AppError> {
+#[derive(Serialize)]
+pub struct UnitSpatinal {
+    pub user_id: i64,
+    pub username: String,
+    pub object_count: i32,
+}
+
+pub async fn get_spatial_handler(State(ctx): State<Arc<AppConfig>>, claim: Claim,) -> Result<impl IntoResponse, AppError> {
     claim
         .Validate()
         .map_err(|e| {});
 
     let result = query_as!(
-        "SELECT user_id, username FROM users WHERE user_id = &1"
-        &claim.sub
+        UnitSpatinal,
+        r#"
+        INSERT INTO users (user_id, username, object_count)
+        VALUES ($1, $2, 0)
+        ON CONFLICT (user_id)
+        DO UPDATE SET last_login = NOW()
+        RETURNING user_id, username, object_count
+        "#,
+        claim.sub,
+        claim.username
     )
-        .fetch_optional(&ctx.db)
-        .await?;
+    .fetch_one(&ctx.db)
+    .await?;
 
-    match result {
-        Some(data) => Ok(JSON(data)),
-        None => {
-            let new_result = query_as!(
-                "INSERT INTO users (user_id, username)
-                VALUES ($1, $2)
-                RETURNING username",
-                claim.sub,
-                claim.username,
-            )
-                .fetch_one(&ctx.db)
-                .await?;
-
-                Ok(JSON(new_result))
-        }
-    }
+    Ok((StatusCode::OK, Json(result)))
 }
