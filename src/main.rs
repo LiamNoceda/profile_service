@@ -1,5 +1,5 @@
 use axum::{
-    routing::{get, post}
+    routing::post,
     Router,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -22,7 +22,7 @@ async fn main() {
         .expect("Failed run database migrations");
 
     let app = Router::new()
-        .route("/", get(get_spatial_handler));
+        .route("/", post(get_spatial_handler));
 
     let listener = tokio::net::TcpListener::bind().await.unwrap();
     axum::serve(listener, app).await.unwrap();
